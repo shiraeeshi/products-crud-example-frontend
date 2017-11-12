@@ -11,7 +11,7 @@ import ProductRow from './ProductRow';
 //   { category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7' }
 // ];
 
-const ProductTable = ({ filter, products, onEdit }) => {
+const ProductTable = ({ filter, products, onEdit, onDelete }) => {
     let rows = [];
 
     products.forEach(p => {
@@ -20,7 +20,7 @@ const ProductTable = ({ filter, products, onEdit }) => {
 
         if (nameLC.indexOf(filterLC) !== -1) {
             rows.push(
-                <ProductRow key={p.name} data={p} onEdit={onEdit} />
+                <ProductRow key={p.name} data={p} onEdit={onEdit} onDelete={onDelete} />
             );
         }
     });
@@ -31,7 +31,8 @@ const ProductTable = ({ filter, products, onEdit }) => {
 ProductTable.propTypes = {
     filter: PropTypes.string,
     products: PropTypes.array,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func
 };
 
 export default ProductTable;

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { filterTable, startEditMode } from '../actions';
+import { filterTable, startEditMode, deleteProduct } from '../actions';
 import ProductTable from '../components/ProductTable';
 import ProductEditForm from './ProductEditForm';
 import { filterableTable } from '../styles/filterableTable.scss';
 
-const FilterableTable = ({ filter, products, onFilter, onEdit }) => {
+const FilterableTable = ({ filter, products, onFilter, onEdit, onDelete }) => {
     let input;
 
     return (
@@ -17,7 +17,7 @@ const FilterableTable = ({ filter, products, onFilter, onEdit }) => {
                 ref={node => {input = node;}}
                 onChange={() => onFilter(input.value)} />
 
-            <ProductTable filter={filter} products={products} onEdit={onEdit} />
+            <ProductTable filter={filter} products={products} onEdit={onEdit} onDelete={onDelete} />
         </div>
     );
 };
@@ -26,7 +26,8 @@ FilterableTable.propTypes = {
     filter: PropTypes.string,
     products: PropTypes.array,
     onFilter: PropTypes.func,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
@@ -39,7 +40,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         onFilter: filterText => dispatch(filterTable(filterText)),
-        onEdit: product => dispatch(startEditMode(product))
+        onEdit: product => dispatch(startEditMode(product)),
+        onDelete: id => dispatch(deleteProduct(id))
     };
 };
 
