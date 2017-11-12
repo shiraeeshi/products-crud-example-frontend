@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { filterTable } from '../actions';
+import { filterTable, startEditMode } from '../actions';
 import ProductTable from '../components/ProductTable';
 import ProductEditForm from './ProductEditForm';
 import { filterableTable } from '../styles/filterableTable.scss';
 
-const FilterableTable = ({ filter, products, onFilter }) => {
+const FilterableTable = ({ filter, products, onFilter, onEdit }) => {
     let input;
 
     return (
@@ -17,7 +17,7 @@ const FilterableTable = ({ filter, products, onFilter }) => {
                 ref={node => {input = node;}}
                 onChange={() => onFilter(input.value)} />
 
-            <ProductTable filter={filter} products={products} />
+            <ProductTable filter={filter} products={products} onEdit={onEdit} />
         </div>
     );
 };
@@ -25,7 +25,8 @@ const FilterableTable = ({ filter, products, onFilter }) => {
 FilterableTable.propTypes = {
     filter: PropTypes.string,
     products: PropTypes.array,
-    onFilter: PropTypes.func
+    onFilter: PropTypes.func,
+    onEdit: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
@@ -37,7 +38,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onFilter: filterText => dispatch(filterTable(filterText))
+        onFilter: filterText => dispatch(filterTable(filterText)),
+        onEdit: product => dispatch(startEditMode(product))
     };
 };
 

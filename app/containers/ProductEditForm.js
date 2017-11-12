@@ -3,26 +3,53 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { addProduct, editProduct } from '../actions';
 
-const ProductEditForm = ({ name, price, id, isNew, onProductEditingDone }) => {
-    let nameInput;
-    let priceInput;
-    // console.log('ProductEditForm', name, price, id, isNew, onProductEditingDone, nameInput, priceInput);
-    return (
-        <div>
-            <form action="#" onSubmit={eve => onProductEditingDone(eve, nameInput.value, priceInput.value, isNew, id)} >
-                <input
-                    value={name}
-                    ref={node => {nameInput = node;}} />
-                <input
-                    value={price}
-                    ref={node => {priceInput = node;}} />
-                <button type="submit">
-                    done
-                </button>
-            </form>
-        </div>
-    );
-};
+class ProductEditForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.updateStateByProps(props);
+    }
+
+    componentWillReceiveProps(props) {
+        this.updateStateByProps(props);
+    }
+
+    updateStateByProps({ name, price, id, isNew, onProductEditingDone }) {
+        this.state = {
+            name,
+            price
+        };
+        this.isNew = isNew;
+        this.id = id;
+        this.onProductEditingDone = onProductEditingDone;
+    }
+
+    handleSubmit = (eve) => {
+        eve.preventDefault();
+        this.props.onProductEditingDone(this.state.name, this.state.price, this.props.isNew, this.props.id);
+    };
+
+    render() {
+        return (
+            <div>
+                <form action="#" onSubmit={eve => {this.handleSubmit(eve);}} >
+                    <input
+                        type="text"
+                        value={this.state.name}
+                        onChange={e => {this.setState({name: e.target.value});}}
+                        />
+                    <input
+                        type="text"
+                        value={this.state.price}
+                        onChange={e => {this.setState({price: e.target.value});}}
+                        />
+                    <button type="submit">
+                        done
+                    </button>
+                </form>
+            </div>
+        );
+    }
+}
 
 ProductEditForm.propTypes = {
     name: PropTypes.string,
@@ -35,6 +62,8 @@ ProductEditForm.propTypes = {
 const mapStateToProps = (state) => {
     if (!state.productToEdit) {
         return {
+            name: '',
+            price: '',
             isNew: true
         };
     }
@@ -47,8 +76,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onProductEditingDone: function(eve, name, price, isNew, id) {
-            eve.preventDefault();
+        onProductEditingDone: (name, price, isNew, id) => {
             if (isNew) {
                 dispatch(addProduct(name, price));
             } else {
