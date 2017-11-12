@@ -1,5 +1,6 @@
 import * as types from './types';
-import Promise from 'promise';
+
+const PRODUCTS_URL = 'http://localhost:9000/v1/products';
 
 export function filterTable(filter) {
     return {
@@ -8,20 +9,24 @@ export function filterTable(filter) {
     };
 }
 
-let nextId = 0;
-let products = [];
-
 const productAdded = product => ({
     type: types.RECEIVE_ADDED_PRODUCT,
     product
 });
 
 export const addProduct = (name, price) => dispatch => {
-    return Promise.resolve(Object.assign({}, {name, price}, {id: nextId++}))
-        .then(product => {
-            products.push(product);
-            dispatch(productAdded(product));
-        });
+    return fetch(PRODUCTS_URL, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({name, price})
+    })
+    .then(response => response.json())
+    .then(product => {
+        dispatch(productAdded(product));
+    });
 };
 
 const productEdited = product => ({
@@ -30,31 +35,31 @@ const productEdited = product => ({
 });
 
 export const editProduct = (id, name, price) => dispatch => {
-    return Promise.resolve({id, name, price})
-        .then(editedProduct => {
-            products = products.map(eachProduct => {
-                let prod;
-                if (eachProduct.id === id) {
-                    prod = editedProduct;
-                } else {
-                    prod = eachProduct;
-                }
-                return prod;
-            });
-            dispatch(productEdited(editedProduct));
-        });
+    return fetch(PRODUCTS_URL + '/' + id, {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({name, price})
+    })
+    .then(response => response.json())
+    .then(editedProduct => {
+        dispatch(productEdited(editedProduct));
+    });
 };
 
 const receiveProducts = (prods) => ({
     type: types.RECEIVE_PRODUCTS,
-    prods
+    products: prods
 });
 
 export const getProducts = () => dispatch => {
-    return Promise.resolve(products)
-        .then(prods => {
-            dispatch(receiveProducts(prods));
-        });
+    return fetch(PRODUCTS_URL)
+    .then(response => response.json())
+    .then(prods => {
+        dispatch(receiveProducts(prods));
+    });
 };
 
 const productDeleted = id => ({
@@ -63,11 +68,16 @@ const productDeleted = id => ({
 });
 
 export const deleteProduct = id => dispatch => {
-    return Promise.resolve()
-        .then(() => {
-            products = products.filter(product => product.id !== id);
-            dispatch(productDeleted(id));
-        });
+    return fetch(PRODUCTS_URL + '/' + id, {
+        method: 'delete'
+    })
+    .then(response => response.json())
+    .then(response => {
+        if (!response.success) {
+            return;
+        }
+        dispatch(productDeleted(id));
+    });
 };
 
 export const startEditMode = product => ({

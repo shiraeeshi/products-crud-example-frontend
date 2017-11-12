@@ -32,6 +32,7 @@ class ProductEditForm extends React.Component {
         return (
             <div>
                 <form action="#" onSubmit={eve => {this.handleSubmit(eve);}} >
+                    {'edit form: '}
                     <input
                         type="text"
                         value={this.state.name}
@@ -53,9 +54,9 @@ class ProductEditForm extends React.Component {
 
 ProductEditForm.propTypes = {
     name: PropTypes.string,
-    price: PropTypes.string,
+    price: PropTypes.number,
     isNew: PropTypes.bool,
-    id: PropTypes.number,
+    id: PropTypes.string,
     onProductEditingDone: PropTypes.func
 };
 
